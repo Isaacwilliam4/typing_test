@@ -13,6 +13,9 @@ import random
 import curses
 import textwrap
 import os
+import matplotlib.pyplot as plt
+import pandas as pd
+from pathlib import Path
 
 # Robust path to default vocabulary, which is based on word frequency
 # from CNN and DailyMail articles.
@@ -236,6 +239,54 @@ class Game:
             self._handle_key(key)
             self._update_display(stdscr, time_left)
 
+    def plot_stats_and_save_fig(self, accuracy, cpm, wpm):
+      csv_path = Path('./stats.csv')
+      fig_path = Path('./stats.png')
+      if csv_path.exists():
+        df = pd.read_csv(csv_path)
+      else:
+        df = pd.DataFrame({'acc':[],'cpm':[],'wpm':[]})
+      row = pd.DataFrame([{'acc':accuracy,'cpm':cpm,'wpm':wpm}])
+      df = pd.concat([df, row], ignore_index=True)
+      df.to_csv(csv_path, index=False)
+      # Create a 2x2 grid of subplots with a larger figure size
+      fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+
+      # Top-left: WPM
+      axes[0, 0].plot(df['wpm'], color='blue', linewidth=2)
+      axes[0, 0].set_title('Words Per Minute (WPM)', fontsize=14)
+      axes[0, 0].set_xlabel('Time', fontsize=12)
+      axes[0, 0].set_ylabel('WPM', fontsize=12)
+      axes[0, 0].grid(True)
+
+      # Top-right: Accuracy
+      axes[0, 1].plot(df['acc'], color='green', linewidth=2)
+      axes[0, 1].set_title('Accuracy (%)', fontsize=14)
+      axes[0, 1].set_xlabel('Time', fontsize=12)
+      axes[0, 1].set_ylabel('Accuracy', fontsize=12)
+      axes[0, 1].grid(True)
+
+      # Bottom-left: CPM
+      axes[1, 0].plot(df['cpm'], color='red', linewidth=2)
+      axes[1, 0].set_title('Characters Per Minute (CPM)', fontsize=14)
+      axes[1, 0].set_xlabel('Time', fontsize=12)
+      axes[1, 0].set_ylabel('CPM', fontsize=12)
+      axes[1, 0].grid(True)
+
+      # Bottom-right: Combined Plot
+      axes[1, 1].plot(df['acc'], label='Accuracy', color='green', linestyle='-', linewidth=2)
+      axes[1, 1].plot(df['wpm'], label='WPM', color='blue', linestyle='--', linewidth=2)
+      axes[1, 1].plot(df['cpm'], label='CPM', color='red', linestyle='-.', linewidth=2)
+      axes[1, 1].set_title('All Metrics', fontsize=14)
+      axes[1, 1].set_xlabel('Time', fontsize=12)
+      axes[1, 1].set_ylabel('Values', fontsize=12)
+      axes[1, 1].legend(fontsize=10, loc='upper right')
+      axes[1, 1].grid(True)
+
+      # Adjust layout and save
+      plt.tight_layout()
+      plt.savefig(fig_path, dpi=300)
+
     def print_stats(self):
         """Print ACC/CPM/WPM to console"""
         correct = len(self.correct)
@@ -246,6 +297,8 @@ class Game:
         print("CPM: {:d}".format(cpm))
         wpm = self.calculate_wpm(self.game_time)
         print("WPM: {:d}".format(wpm))
+        self.plot_stats_and_save_fig(accuracy, cpm, wpm)
+
 
     def restart(self):
         """
