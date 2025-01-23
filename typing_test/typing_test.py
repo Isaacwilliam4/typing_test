@@ -16,10 +16,11 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 from pathlib import Path
+import numpy as np
 
 # Robust path to default vocabulary, which is based on word frequency
 # from CNN and DailyMail articles.
-VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "vocab")
+VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "words.txt")
 
 # Used for WPM calculation
 CHARS_PER_WORD = 5
@@ -367,7 +368,7 @@ def main():
         "--max_length",
         type=int,
         metavar="max-word-length",
-        default=10,
+        default=np.inf,
         help="maximum word length",
     )
     parser.add_argument(
@@ -375,7 +376,7 @@ def main():
         "--words",
         type=int,
         metavar="words-to-read",
-        default=200,
+        default=np.inf,
         help="the amount of words to read from vocab - higher increases difficulty",
     )
     parser.add_argument(
