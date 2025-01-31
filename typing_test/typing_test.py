@@ -69,9 +69,9 @@ class Game:
 
             if len(words) >= args.words:
                 break
-
+        punc = ['(',')','{','}',';','-','_','/','.',',','[',']','=','\"','\'']
         while True:
-            yield random.choice(words)
+            yield random.choice(words) + random.choice(punc)
 
     def calculate_cpm(self, time_played):
         """Calculate CPM given time_played in seconds"""
