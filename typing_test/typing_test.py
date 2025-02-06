@@ -62,7 +62,12 @@ class Game:
     @staticmethod
     def _word_generator(args):
         words = []
-        for line in open(args.vocab):
+        if args.level == 'easy':
+          vocab = os.path.join(os.path.dirname(__file__), "data", "vocab")
+        else:
+          vocab = os.path.join(os.path.dirname(__file__), "data", "words.txt")
+
+        for line in open(vocab):
             word = line.strip()
             if args.min_length <= len(word) <= args.max_length:
                 words.append(word)
@@ -71,7 +76,10 @@ class Game:
                 break
         punc = ['(',')','{','}',';','-','_','/','.',',','[',']','=','\"','\'']
         while True:
+          if args.level == 'hard':
             yield random.choice(words) + random.choice(punc)
+          else:
+            yield random.choice(words)
 
     def calculate_cpm(self, time_played):
         """Calculate CPM given time_played in seconds"""
@@ -394,6 +402,13 @@ def main():
         metavar="display",
         default="10ff",
         help="how to display words to type '10ff' or 'progressive'",
+    )
+    parser.add_argument(
+        "-l",
+        "--level",
+        choices=['easy', 'hard'],
+        default='easy',
+        help="difficulty",
     )
     args = parser.parse_args()
     game = Game(args)
