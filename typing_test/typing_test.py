@@ -62,7 +62,9 @@ class Game:
     @staticmethod
     def _word_generator(args):
         words = []
-        if args.level == 'easy':
+        if args.level =='easy':
+          vocab = os.path.join(os.path.dirname(__file__), "data", "1000-most-common-words.txt")
+        elif args.level == 'medium':
           vocab = os.path.join(os.path.dirname(__file__), "data", "vocab")
         else:
           vocab = os.path.join(os.path.dirname(__file__), "data", "words.txt")
@@ -406,7 +408,7 @@ def main():
     parser.add_argument(
         "-l",
         "--level",
-        choices=['easy', 'hard'],
+        choices=['easy','medium', 'hard'],
         default='easy',
         help="difficulty",
     )
