@@ -23,7 +23,7 @@ import numpy as np
 VOCAB_PATH = os.path.join(os.path.dirname(__file__), "data", "words.txt")
 
 # Used for WPM calculation
-CHARS_PER_WORD = 5
+
 
 # Amount of words to store, for showing several future words
 # Should generally be equal to at least two lines worth of words
@@ -38,7 +38,7 @@ class Game:
     Class encapsulating the Game.
     Includes game stats, input management, game display.
     """
-
+    CHARS_PER_WORD = 0
     CORRECT_COLOR = 1
     INCORRECT_COLOR = 2
 
@@ -77,6 +77,8 @@ class Game:
             if len(words) >= args.words:
                 break
         punc = ['(',')','{','}',';','-','_','/','.',',','[',']','=','\"','\'']
+        #chars per word should be the average word length
+        Game.CHARS_PER_WORD = sum([len(word) for word in words]) / len(words)
         while True:
           if args.level == 'hard':
             yield random.choice(words) + random.choice(punc)
@@ -96,7 +98,7 @@ class Game:
     def calculate_wpm(self, time_played):
         """Calculate WPM given time_played in seconds"""
         cpm = self.calculate_cpm(time_played)
-        wpm = cpm // CHARS_PER_WORD
+        wpm = cpm // Game.CHARS_PER_WORD
         return wpm
 
     def _get_word(self):
@@ -137,7 +139,7 @@ class Game:
 
         stdscr.clear()
         wpm = self.calculate_wpm(self.game_time - time_left)
-        stdscr.addstr("Time left: {:d}, WPM: {:d}\n".format(time_left, wpm))
+        stdscr.addstr("Time left: {:.0f}, WPM: {:.0f}\n".format(time_left, wpm))
 
         line = self._get_line(self.next_words, width)
         target = " ".join(line)
@@ -159,7 +161,7 @@ class Game:
         stdscr.clear()
 
         wpm = self.calculate_wpm(self.game_time - time_left)
-        stdscr.addstr("Time left: {:d}, WPM: {:d}\n".format(time_left, wpm))
+        stdscr.addstr("Time left: {:.0f}, WPM: {:.0f}\n".format(time_left, wpm))
 
         # sets up initial lines
         if not self.current_line:
